@@ -1,0 +1,20 @@
+{
+  "name": "jev-voice-browser-local",
+  "private": true,
+  "type": "module",
+  "description": "Talk to your browser, with speech-to-text and decisions on your own GPU (jev-vllm example)",
+  "scripts": {
+    "server": "bun server.ts",
+    "build": "bun build extension/src/panel.ts extension/src/background.ts --outdir extension/dist --target browser",
+    "setup:whisper": "bun scripts/setup-whisper.ts",
+    "test": "bun test test/",
+    "eval": "bun eval/run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^20.14.5",
+    "@types/bun": "^1.2.0",
+    "@types/chrome": "^0.0.300",
+    "typescript": "^5.6.0"
+  }
+}

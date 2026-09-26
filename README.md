@@ -104,6 +104,14 @@ flowchart LR
 
 </details>
 
+## Example: voice browser
+
+[`examples/voice-browser`](examples/voice-browser) lets you talk to your browser:
+it clicks, types, scrolls and navigates, often before you finish the sentence. It
+uses local whisper.cpp for speech-to-text, and one `/v1/systemone` read of 9–10
+typed questions per partial transcript (~130 ms on a GB10). It scores 37/38 on its
+spoken-command eval, and no audio or data leaves your hardware.
+
 ## Quick start
 
 ### Requirements
@@ -302,6 +310,7 @@ bun client/bench.ts                                         # latency/throughput
 | `k8s/` | namespace, download Job, cache PV/PVC, `LLMInferenceService`, djev Deployment + Service |
 | `djev/` | vendored `structured_server.py` ([mmastrac/djev](https://github.com/mmastrac/djev) @ `e5841cf`), shipped as the `djev-code` ConfigMap |
 | `client/` | bun smoke test, benchmark and example payloads |
+| `examples/voice-browser/` | voice-controlled browser: Chrome extension + local whisper.cpp + djev |
 | `docs/` | README diagrams (SVG) and `social/` PNG/MP4/GIF renders |
 | `tools/diagrams/` | rebuilds `docs/social/` from the SVGs: `bun install && bun render.ts` |
 

@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "jev voice browser (local)",
+  "version": "0.1.0",
+  "description": "Talk to your browser. Speech-to-text and decisions run on your own GPU via jev-vllm.",
+  "permissions": ["tabs", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "dist/background.js", "type": "module" },
+  "action": { "default_title": "Open voice control" }
+}

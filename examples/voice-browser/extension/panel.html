@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Voice control</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header>
+    <button id="mic" class="mic" aria-pressed="false">Start listening</button>
+    <div class="status"><span id="conn" class="dot"></span><span id="connText">disconnected</span></div>
+  </header>
+
+  <section class="live">
+    <div id="speaking" class="speaking" hidden>● speaking</div>
+    <p id="transcript" class="transcript">Say something like “open YouTube”.</p>
+    <p id="verdict" class="verdict"></p>
+    <p id="timing" class="timing"></p>
+  </section>
+
+  <ol id="log" class="log"></ol>
+
+  <details class="settings">
+    <summary>Settings</summary>
+    <label>Server <input id="server" spellcheck="false"></label>
+    <p class="hint">The voice-browser server on your GPU box, e.g. <code>ws://localhost:8790/ws</code> through an SSH or VS Code port forward.</p>
+  </details>
+
+  <details class="help">
+    <summary>Things to say</summary>
+    <ul>
+      <li>open wikipedia · go to news dot ycombinator dot com</li>
+      <li>search for lofi music on youtube</li>
+      <li>click the second video · open the Turing machine link</li>
+      <li>type hello world in the search box and press enter</li>
+      <li>scroll down · scroll to the top · go back · reload</li>
+      <li>new tab · next tab · close this tab</li>
+      <li>place order → says “confirm?” → confirm / cancel</li>
+    </ul>
+  </details>
+
+  <script src="dist/panel.js" type="module"></script>
+</body>
+</html>
