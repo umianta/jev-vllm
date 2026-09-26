@@ -4,6 +4,11 @@
 probabilities back, not paragraphs.** Runs on your own GPU with open weights and
 speaks the same `/v1/systemone` API as TypeSafe AI's Jev.
 
+[![Explainer video: architecture, live /v1/systemone requests, performance and the voice browser (1:54)](docs/social/jev-vllm-explainer-thumbnail.png)](docs/social/jev-vllm-explainer.mp4)
+
+*Two-minute explainer: architecture, live requests and responses, performance, and
+the voice browser. Every payload and number in it was captured from a live deployment.*
+
 ## Why
 
 Most of what applications ask an LLM is not open-ended writing but a small,
@@ -234,7 +239,10 @@ JSON system message (with `options` instead of `criteria`) and the state JSON as
 user message. All other routes pass through to vLLM; `/v1/raw/chat/completions`
 forces pass-through.
 
-[`client/payloads/`](client/payloads) has a working request for each feature:
+[`client/payloads/`](client/payloads) has a working request for each feature. The same
+requests are in a Postman collection,
+[`client/postman/jev-vllm.postman_collection.json`](client/postman/jev-vllm.postman_collection.json)
+(import it and set `baseUrl`):
 
 | File | Shows |
 |---|---|
@@ -346,10 +354,10 @@ bun client/bench.ts                                         # latency/throughput
 | `scripts/deploy.ts` | one-command deploy |
 | `k8s/` | namespace, download Job, cache PV/PVC, `LLMInferenceService`, djev Deployment + Service |
 | `djev/` | vendored `structured_server.py` ([mmastrac/djev](https://github.com/mmastrac/djev) @ `e5841cf`), shipped as the `djev-code` ConfigMap |
-| `client/` | bun smoke test, benchmark and example payloads |
+| `client/` | bun smoke test, benchmark, example payloads and a Postman collection (`client/postman/`) |
 | `examples/voice-browser/` | voice-controlled browser: Chrome extension + local whisper.cpp + djev |
-| `docs/` | README diagrams (SVG) and `social/` PNG/MP4/GIF renders |
-| `tools/diagrams/` | rebuilds `docs/social/` from the SVGs: `bun install && bun render.ts` |
+| `docs/` | README diagrams (SVG), `social/` renders and the explainer video |
+| `tools/diagrams/` | rebuilds `docs/social/`: `bun render.ts` (diagrams), `bun capture.ts` then `bun video.ts` (video) |
 
 **Uninstall:** `kubectl delete -k .` The PV uses `Retain`, so the model files stay
 in the cache directory.

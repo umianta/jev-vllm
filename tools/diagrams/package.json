@@ -2,9 +2,11 @@
   "name": "jev-vllm-diagrams",
   "private": true,
   "type": "module",
-  "description": "Render docs/*.svg into PNG / MP4 / GIF for social posts",
+  "description": "Render the README diagrams and the explainer video",
   "scripts": {
-    "render": "bun render.ts"
+    "render": "bun render.ts",
+    "capture": "bun capture.ts",
+    "video": "bun video.ts"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

@@ -1,0 +1,359 @@
+{
+  "capturedAt": "2026-09-26T17:40:59.171Z",
+  "endpoint": "http://localhost:8011/v1/systemone",
+  "simple": {
+    "request": {
+      "model": "diffusiongemma",
+      "samples": 1,
+      "state": {
+        "ticket": "Everything is down and we have a demo at noon."
+      },
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does the customer need a reply within the hour?"
+        }
+      }
+    },
+    "status": 200,
+    "ms": 76,
+    "response": {
+      "model": "diffusiongemma",
+      "answers": {
+        "urgent": {
+          "type": "noul",
+          "noul": 0.9714636203951773
+        }
+      },
+      "usage": {
+        "input_tokens": 98,
+        "output_tokens": 8
+      }
+    }
+  },
+  "multi": {
+    "request": {
+      "model": "diffusiongemma",
+      "state": {
+        "ticket": "Everything is down and we have a demo at noon. Please call me: 555-0100."
+      },
+      "questions": {
+        "urgent": {
+          "type": "noul",
+          "instructions": "Does the customer need a reply within the hour?"
+        },
+        "category": {
+          "type": "choice",
+          "instructions": "What is this ticket about?",
+          "criteria": {
+            "billing": "payments",
+            "bug": "something broken",
+            "sales": "buying"
+          }
+        },
+        "escalate": {
+          "type": "noul",
+          "instructions": "Should this be escalated to an on-call engineer?",
+          "depends_on": [
+            "urgent",
+            "category"
+          ]
+        },
+        "phone": {
+          "type": "span",
+          "instructions": "the phone number"
+        }
+      },
+      "samples": 1
+    },
+    "status": 200,
+    "ms": 381,
+    "response": {
+      "model": "diffusiongemma",
+      "answers": {
+        "urgent": {
+          "type": "noul",
+          "noul": 0.6295415467216139
+        },
+        "category": {
+          "type": "choice",
+          "choice": "bug",
+          "probabilities": {
+            "billing": 0.0038327764997953327,
+            "bug": 0.9961122020339365,
+            "sales": 0.000055021466268300744
+          },
+          "confidence": 0.9961122020339365
+        },
+        "escalate": {
+          "type": "noul",
+          "noul": 0.9996665404154959
+        },
+        "phone": {
+          "type": "span",
+          "found": true,
+          "text": "555-0100",
+          "start": 75,
+          "end": 83,
+          "confidence": 0.9704,
+          "coverage": 0.994,
+          "reads": 1
+        }
+      },
+      "usage": {
+        "input_tokens": 178,
+        "output_tokens": 50
+      }
+    }
+  },
+  "voice": {
+    "request": {
+      "model": "diffusiongemma",
+      "samples": 1,
+      "state": {
+        "transcript": "play the one about transformers",
+        "page": {
+          "url": "https://www.youtube.com/",
+          "title": "YouTube"
+        },
+        "elements": "a: link \"Home\"\nb: link \"Shorts\"\nc: link \"Subscriptions\"\nd: input \"Search\"\ne: button \"Search\"\nf: button \"Voice search\"\ng: link \"Lofi hip hop radio - beats to relax/study to\"\nh: link \"How transformers work, explained visually\"\ni: link \"Gordon Ramsay's perfect scrambled eggs\"\nj: link \"SpaceX Starship flight 12 full launch\"\nk: link \"Learn Rust in 30 minutes\"\nl: button \"Sign in\"",
+        "recent_actions": "(none)"
+      },
+      "questions": {
+        "is_command": {
+          "type": "noul",
+          "instructions": "Is the transcript an instruction for the web browser (as opposed to talking to another person, thinking aloud or background speech)?"
+        },
+        "complete": {
+          "type": "noul",
+          "instructions": "Is the spoken command complete, with nothing important still missing? A search needs its search words, a click needs what to click, an open needs the site."
+        },
+        "intent": {
+          "type": "choice",
+          "instructions": "Which browser action does the transcript ask for?",
+          "criteria": {
+            "open": "go to a website or web address",
+            "search": "search for something",
+            "click": "click, press, open or select a link, button or item on the current page",
+            "type": "type or enter text into a field on the current page",
+            "scroll": "scroll the page up or down",
+            "back": "go back to the previous page",
+            "forward": "go forward to the next page in history",
+            "reload": "reload or refresh the page",
+            "tab": "open a new empty tab",
+            "close": "close the current tab",
+            "switch": "switch to another open tab",
+            "none": "none of these, or not a browser command"
+          }
+        },
+        "destructive": {
+          "type": "noul",
+          "instructions": "Would doing this buy, pay, delete, send, post or submit something?"
+        },
+        "scroll_dir": {
+          "type": "choice",
+          "instructions": "If scrolling, which direction?",
+          "criteria": {
+            "down": "down, further into the page",
+            "up": "up, towards the top"
+          }
+        },
+        "scroll_amount": {
+          "type": "score",
+          "instructions": "If scrolling, how far?",
+          "criteria": [
+            "little",
+            "page",
+            "end"
+          ]
+        },
+        "tab_which": {
+          "type": "choice",
+          "instructions": "If switching tabs, which tab?",
+          "criteria": {
+            "next": "the next tab",
+            "previous": "the previous tab",
+            "first": "the first tab",
+            "last": "the last tab"
+          }
+        },
+        "is_correction": {
+          "type": "noul",
+          "instructions": "Is the speaker rejecting or correcting the most recent action in recent_actions (for example 'no, the other one' or 'undo that')?"
+        },
+        "target": {
+          "type": "choice",
+          "instructions": "Which page element does the speaker mean? Match their words to an element's label or role. They may also say the element's letter.",
+          "criteria": {
+            "a": "link \"Home\"",
+            "b": "link \"Shorts\"",
+            "c": "link \"Subscriptions\"",
+            "d": "input \"Search\"",
+            "e": "button \"Search\"",
+            "f": "button \"Voice search\"",
+            "g": "link \"Lofi hip hop radio - beats to relax/study to\"",
+            "h": "link \"How transformers work, explained visually\"",
+            "i": "link \"Gordon Ramsay's perfect scrambled eggs\"",
+            "j": "link \"SpaceX Starship flight 12 full launch\"",
+            "k": "link \"Learn Rust in 30 minutes\"",
+            "l": "button \"Sign in\""
+          }
+        }
+      }
+    },
+    "status": 200,
+    "ms": 138,
+    "response": {
+      "model": "diffusiongemma",
+      "answers": {
+        "is_command": {
+          "type": "noul",
+          "noul": 0.9986886568604623
+        },
+        "complete": {
+          "type": "noul",
+          "noul": 0.9541206352184721
+        },
+        "intent": {
+          "type": "choice",
+          "choice": "click",
+          "probabilities": {
+            "open": 0.0003203062596088428,
+            "search": 0.00014566673296829473,
+            "click": 0.9984631241338225,
+            "type": 0.00029392506108861307,
+            "scroll": 0.000040116003669928795,
+            "back": 0.00003478057150989414,
+            "forward": 0.0000025613161999778127,
+            "reload": 0.00004409891389890278,
+            "tab": 0.0000015907927414510265,
+            "close": 0.000022549290668511525,
+            "switch": 0.0000033270197678895425,
+            "none": 0.0006279539040552371
+          },
+          "confidence": 0.9984631241338225
+        },
+        "destructive": {
+          "type": "noul",
+          "noul": 0.00003656489071971356
+        },
+        "scroll_dir": {
+          "type": "choice",
+          "choice": "up",
+          "probabilities": {
+            "down": 0.22570631782959347,
+            "up": 0.7742936821704065
+          },
+          "confidence": 0.7742936821704065
+        },
+        "scroll_amount": {
+          "type": "score",
+          "score": 0.2815585980538601,
+          "legend": {
+            "0": "little",
+            "1": "page",
+            "2": "end"
+          },
+          "probabilities": {
+            "0": 0.8296057201532451,
+            "1": 0.059229961639649914,
+            "2": 0.11116431820710507
+          },
+          "confidence": 0.8296057201532451
+        },
+        "tab_which": {
+          "type": "choice",
+          "choice": "next",
+          "probabilities": {
+            "next": 0.5921752051233519,
+            "previous": 0.3810346435684709,
+            "first": 0.013990870054967994,
+            "last": 0.01279928125320924
+          },
+          "confidence": 0.5921752051233519
+        },
+        "is_correction": {
+          "type": "noul",
+          "noul": 0.000012584097553974095
+        },
+        "target": {
+          "type": "choice",
+          "choice": "h",
+          "probabilities": {
+            "a": 0.05042258799624119,
+            "b": 0.0044674470595747005,
+            "c": 0.0016732552666297675,
+            "d": 0.0006765961018324816,
+            "e": 0.0032877397898294133,
+            "f": 0.0008853068943784435,
+            "g": 0.0002527117119693306,
+            "h": 0.9179562756356475,
+            "i": 0.000985243612363949,
+            "j": 0.004944588702364968,
+            "k": 0.003460901117598202,
+            "l": 0.010987346111569905
+          },
+          "confidence": 0.9179562756356475
+        }
+      },
+      "usage": {
+        "input_tokens": 858,
+        "output_tokens": 51
+      }
+    }
+  },
+  "chat": {
+    "request": {
+      "model": "diffusiongemma",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Ticket: \"Everything is down and we have a demo at noon.\" Does the customer need a reply within the hour? Answer yes or no."
+        }
+      ],
+      "max_tokens": 16
+    },
+    "status": 200,
+    "ms": 616,
+    "response": {
+      "id": "chatcmpl-942985fb3298f582",
+      "object": "chat.completion",
+      "created": 1790444463,
+      "model": "diffusiongemma",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "thought\nYes",
+            "refusal": null,
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "reasoning": null
+          },
+          "logprobs": null,
+          "finish_reason": "stop",
+          "stop_reason": null,
+          "token_ids": null,
+          "routed_experts": null
+        }
+      ],
+      "service_tier": null,
+      "system_fingerprint": "vllm-0.30.1rc1.dev48+g7f1a5398e-8df088d3",
+      "usage": {
+        "prompt_tokens": 38,
+        "total_tokens": 44,
+        "completion_tokens": 6,
+        "prompt_tokens_details": null,
+        "completion_tokens_details": null
+      },
+      "prompt_logprobs": null,
+      "prompt_token_ids": null,
+      "prompt_text": null,
+      "kv_transfer_params": null,
+      "ec_transfer_params": null,
+      "metrics": null
+    }
+  }
+}

@@ -1,0 +1,306 @@
+{
+  "info": {
+    "name": "jev-vllm /v1/systemone",
+    "description": "Structured reads against jev-vllm (djev + DiffusionGemma on vLLM). Set baseUrl, e.g. after `kubectl -n jev-vllm port-forward svc/djev 8011:8011`. https://github.com/umianta/jev-vllm",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8011"
+    }
+  ],
+  "item": [
+    {
+      "name": "0 · one yes/no question",
+      "request": {
+        "method": "POST",
+        "description": "Smallest structured read: one noul (yes/no) question, one probability back.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"samples\": 1,\n  \"state\": {\n    \"ticket\": \"Everything is down and we have a demo at noon.\"\n  },\n  \"questions\": {\n    \"urgent\": {\n      \"type\": \"noul\",\n      \"instructions\": \"Does the customer need a reply within the hour?\"\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "1 · choice",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/1-choice.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"state\": {\n    \"ticket\": \"I was charged twice for my subscription this month.\"\n  },\n  \"questions\": {\n    \"category\": {\n      \"type\": \"choice\",\n      \"instructions\": \"What is this support ticket about?\",\n      \"criteria\": {\n        \"billing\": \"payment, invoices, refunds\",\n        \"bug\": \"something is broken\",\n        \"sales\": \"pricing or buying\"\n      }\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2 · score",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/2-score.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"state\": {\n    \"ticket\": \"This is the THIRD time my order is late and nobody answers!!\"\n  },\n  \"questions\": {\n    \"tone\": {\n      \"type\": \"score\",\n      \"instructions\": \"How upset is the customer?\",\n      \"criteria\": [\n        \"calm\",\n        \"annoyed\",\n        \"furious\"\n      ]\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3 · multi-depends",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/3-multi-depends.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"state\": {\n    \"ticket\": \"Everything is down and we have a demo at noon. Please call me: 555-0100.\"\n  },\n  \"questions\": {\n    \"urgent\": {\n      \"type\": \"noul\",\n      \"instructions\": \"Does the customer need a reply within the hour?\"\n    },\n    \"category\": {\n      \"type\": \"choice\",\n      \"instructions\": \"What is this ticket about?\",\n      \"criteria\": {\n        \"billing\": \"payments\",\n        \"bug\": \"something broken\",\n        \"sales\": \"buying\"\n      }\n    },\n    \"escalate\": {\n      \"type\": \"noul\",\n      \"instructions\": \"Should this be escalated to an on-call engineer?\",\n      \"depends_on\": [\n        \"urgent\",\n        \"category\"\n      ]\n    },\n    \"phone\": {\n      \"type\": \"span\",\n      \"instructions\": \"the phone number\"\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4 · ask-if",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/4-ask-if.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"state\": {\n    \"ticket\": \"Everything is down and we have a demo at noon.\"\n  },\n  \"questions\": {\n    \"urgent\": {\n      \"type\": \"noul\",\n      \"instructions\": \"Does the customer need a reply within the hour?\"\n    },\n    \"tone\": {\n      \"type\": \"score\",\n      \"instructions\": \"How upset is the customer?\",\n      \"criteria\": [\n        \"calm\",\n        \"annoyed\",\n        \"furious\"\n      ],\n      \"ask_if\": {\n        \"urgent\": [\n          \"yes\"\n        ]\n      }\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5 · noul-criteria-think",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/5-noul-criteria-think.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"think\": 128,\n  \"state\": {\n    \"order\": {\n      \"id\": \"A-77\",\n      \"days_late\": 9,\n      \"value_usd\": 1200\n    }\n  },\n  \"questions\": {\n    \"refund\": {\n      \"type\": \"noul\",\n      \"instructions\": \"Should we offer a refund?\",\n      \"criteria\": {\n        \"true\": \"the order is more than a week late or high value\",\n        \"false\": \"delay is minor\"\n      }\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6 · chat",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/6-chat.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"{\\\"questions\\\":[{\\\"id\\\":\\\"urgent\\\",\\\"type\\\":\\\"noul\\\",\\\"instructions\\\":\\\"Does the customer need a reply within the hour?\\\"},{\\\"id\\\":\\\"bucket\\\",\\\"type\\\":\\\"choice\\\",\\\"instructions\\\":\\\"Ticket topic?\\\",\\\"options\\\":[{\\\"name\\\":\\\"billing\\\",\\\"description\\\":\\\"payments\\\"},{\\\"name\\\":\\\"bug\\\",\\\"description\\\":\\\"broken\\\"}]}]}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{\\\"ticket\\\":\\\"Everything is down and we have a demo at noon.\\\"}\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/chat/completions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "chat",
+            "completions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "7 · spans-dates",
+      "request": {
+        "method": "POST",
+        "description": "client/payloads/7-spans-dates.json",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"state\": \"Invoice #A-1042 issued 2024-02-01, total due $1,234.56 by 2024-03-15.\",\n  \"questions\": {\n    \"dates\": {\n      \"type\": \"spans\",\n      \"instructions\": \"date\"\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/systemone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "systemone"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8 · plain chat, for comparison",
+      "request": {
+        "method": "POST",
+        "description": "The same question as ordinary chat, passed straight through to vLLM: slower, and returns text.",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"model\": \"diffusiongemma\",\n  \"max_tokens\": 16,\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Ticket: \\\"Everything is down and we have a demo at noon.\\\" Does the customer need a reply within the hour? Answer yes or no.\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/v1/raw/chat/completions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v1",
+            "raw",
+            "chat",
+            "completions"
+          ]
+        }
+      }
+    }
+  ]
+}
