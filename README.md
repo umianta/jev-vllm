@@ -1,16 +1,56 @@
 # jev-vllm
 
-Self-hosted structured decisions on Kubernetes. Ask typed questions about a JSON
-state (yes/no, choice, score, span) and get probabilities back in
-~80–210 ms, with no text to parse.
+**A self-hosted decision API: ask typed questions about your data and get
+probabilities back, not paragraphs.** Runs on your own GPU with open weights and
+speaks the same `/v1/systemone` API as TypeSafe AI's Jev.
 
-It runs Google's **DiffusionGemma 26B-A4B (NVFP4)** on **vLLM** through **KServe
+## Why
+
+Most of what applications ask an LLM is not open-ended writing but a small,
+typed decision: *Is this ticket urgent? Which team should handle it? How risky is
+this change, on a 1–5 scale?* Sending those through a chat model is a poor fit:
+
+- **It's slow.** The model writes its answer token by token, left to right, even
+  when the answer is one word.
+- **It's text.** You parse `"Yes, this looks urgent because..."` back into a value
+  and handle every way that parse can fail.
+- **There's no usable confidence.** A rule like `escalate if p > 0.8` needs a real
+  probability, and a chat reply doesn't give you one.
+
+**Jev** from TypeSafe AI is a hosted "System One"
+model built for exactly this: fast, structured judgments instead of free-form
+text. You describe your questions (yes/no, pick a label, rate on a scale) and it
+returns one structured answer per question with a probability, suitable for risk
+gates and routing.
+
+**jev-vllm gives you the same API on hardware you own.** It uses Google's
+**DiffusionGemma**, a text-diffusion model that refines a whole canvas of tokens in
+parallel rather than writing left to right. A typed answer then takes a **single
+denoise step**: the answer slot is filled in one parallel pass, and the
+probabilities of the allowed labels are read straight off the model.
+
+| | Jev (hosted) | jev-vllm (this repo) |
+|---|---|---|
+| Model | proprietary, trained for typed decisions | DiffusionGemma 26B-A4B, open weights |
+| Runs | TypeSafe's cloud; setup is an API key | your Kubernetes cluster and Blackwell GPU |
+| Latency | ~70–500 ms including network | 79 ms (1 draw) to 210 ms (default), measured locally without network |
+| Cost | ~$0.001 per decision | free; you pay for the GPU |
+| Probabilities | calibrated: 0.8 means right ~80% of the time | **not calibrated**; validate on your own data before thresholding |
+| Data | leaves your network | stays on your hardware; works offline |
+
+Choose **Jev** for production volume, trusted probabilities and no infrastructure.
+Choose **jev-vllm** when decisions must stay on your own hardware, you need
+high-volume bulk decisions without per-call cost, or you want to experiment, and
+you are prepared to own quality and calibration yourself.
+
+*Jev figures come from an [independent comparison](https://jevtypesafeai.com/compare/diffusion-gemma-vs-jev)
+and were not measured here. jev-vllm is not Jev and is not affiliated with TypeSafe AI.*
+
+## At a glance
+
+Google's **DiffusionGemma 26B-A4B (NVFP4)** runs on **vLLM** through **KServe
 `LLMInferenceService`**, with the [djev](https://github.com/mmastrac/djev) decision
-server in front exposing a Jev-compatible `/v1/systemone` API.
-
-> This is an open reimplementation of the `/v1/systemone` wire API from TypeSafe
-> AI's proprietary Jev model. It is not Jev and is not affiliated with TypeSafe AI;
-> the model and answer quality differ.
+server in front exposing `/v1/systemone`:
 
 ```jsonc
 // POST /v1/systemone
