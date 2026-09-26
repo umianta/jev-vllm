@@ -10,9 +10,9 @@ describe("normalizeServer", () => {
     ["https://gpu.example.com", "wss://gpu.example.com/ws"],
   ])("%p → %p", (input, url) => expect(normalizeServer(input)).toEqual({ url }));
 
-  test("warns when given djev's port", () => {
+  test("corrects djev's port to the voice-browser server", () => {
     const r = normalizeServer("http://localhost:8011");
-    expect(r.url).toBe("ws://localhost:8011/ws");
+    expect(r.url).toBe("ws://localhost:8790/ws");
     expect(r.warning).toContain("DJEV_URL");
   });
 });
