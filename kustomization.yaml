@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - k8s/00-namespace.yaml
+  - k8s/10-model-cache.yaml
+  - k8s/20-llmisvc-diffusiongemma.yaml
+  - k8s/30-djev.yaml
+configMapGenerator:
+  - name: djev-code
+    namespace: jev-vllm
+    files:
+      - djev/structured_server.py

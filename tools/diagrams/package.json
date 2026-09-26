@@ -1,0 +1,14 @@
+{
+  "name": "jev-vllm-diagrams",
+  "private": true,
+  "type": "module",
+  "description": "Render docs/*.svg into PNG / MP4 / GIF for social posts",
+  "scripts": {
+    "render": "bun render.ts"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@xmldom/xmldom": "^0.9.8"
+  }
+}

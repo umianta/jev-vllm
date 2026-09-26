@@ -1,0 +1,3 @@
+{"model":"diffusiongemma","think":128,"state":{"order":{"id":"A-77","days_late":9,"value_usd":1200}},
+ "questions":{"refund":{"type":"noul","instructions":"Should we offer a refund?",
+   "criteria":{"true":"the order is more than a week late or high value","false":"delay is minor"}}}}

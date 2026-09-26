@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif">
+  <style>
+    :root { --bg:#ffffff; --box:#f6f8fa; --stroke:#d0d7de; --text:#1f2328; --muted:#59636e; --req:#0969da; --res:#1a7f37; --gpu:#8250df; --cell:#ffffff; --noise:#8c959f; --bar:#eaeef2; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0d1117; --box:#161b22; --stroke:#30363d; --text:#e6edf3; --muted:#9198a1; --req:#4493f8; --res:#3fb950; --gpu:#ab7df8; --cell:#0d1117; --noise:#6e7681; --bar:#21262d; }
+    }
+    .bg { fill: var(--bg); }
+    .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; }
+    .t { fill: var(--text); font-size: 17px; font-weight: 600; }
+    .s { fill: var(--muted); font-size: 12px; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .cell { fill: var(--cell); stroke: var(--stroke); }
+    .slot { fill: var(--cell); stroke: var(--gpu); stroke-dasharray: 3 2; }
+    .tok { fill: var(--text); font-size: 12px; }
+    .nz { fill: var(--noise); }
+    .lane { stroke: var(--stroke); stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .lreq { fill: var(--req); font-size: 11px; }
+    .lres { fill: var(--res); font-size: 11px; }
+    .preq { fill: var(--req); }
+    .pres { fill: var(--res); }
+    .hl { fill: none; stroke: var(--req); stroke-width: 2.5; }
+    .flash { fill: var(--gpu); }
+    .gpuline { stroke: var(--gpu); }
+    .barbg { fill: var(--bar); }
+    .bar { fill: var(--res); }
+    .yes { fill: var(--gpu); font-size: 13px; font-weight: 700; }
+    .foot { fill: var(--muted); font-size: 12px; }
+  </style>
+  <defs>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4"/></filter>
+    <!-- flickering noise, reused in every masked answer slot -->
+    <g id="noise">
+      <rect class="nz" x="4" y="6" width="5" height="5"><animate attributeName="opacity" values="1;.1;.8;.2;1" dur="0.45s" repeatCount="indefinite"/></rect>
+      <rect class="nz" x="12" y="15" width="5" height="5"><animate attributeName="opacity" values=".2;1;.3;.9;.2" dur="0.37s" repeatCount="indefinite"/></rect>
+      <rect class="nz" x="20" y="5" width="5" height="5"><animate attributeName="opacity" values=".7;.1;1;.3;.7" dur="0.52s" repeatCount="indefinite"/></rect>
+      <rect class="nz" x="27" y="14" width="5" height="5"><animate attributeName="opacity" values=".1;.9;.2;1;.1" dur="0.41s" repeatCount="indefinite"/></rect>
+    </g>
+  </defs>
+  <rect class="bg" width="960" height="300" rx="8"/>
+
+  <!-- lanes -->
+  <path class="lane" d="M260,150 H380"/>
+  <path class="lane" d="M620,150 H740"/>
+  <path class="lane" d="M740,205 H620"/>
+  <path class="lane" d="M380,205 H260"/>
+  <text class="lreq m" x="320" y="140" text-anchor="middle">seed canvas</text>
+  <text class="lreq m" x="680" y="140" text-anchor="middle">max_steps=1</text>
+  <text class="lres m" x="680" y="226" text-anchor="middle">argmax+logits</text>
+  <text class="lres m" x="320" y="226" text-anchor="middle">logprobs</text>
+
+  <!-- djev -->
+  <rect class="box" x="20" y="50" width="240" height="200" rx="10"/>
+  <text class="t m" x="140" y="80" text-anchor="middle">djev :8011</text>
+  <text class="s" x="140" y="99" text-anchor="middle">canvas = template + noise</text>
+  <g class="m">
+    <rect class="cell" x="33" y="115" width="38" height="26" rx="4"/><text class="tok" x="52" y="132" text-anchor="middle">is</text>
+    <rect class="cell" x="76" y="115" width="38" height="26" rx="4"/><text class="tok" x="95" y="132" text-anchor="middle">sky</text>
+    <rect class="cell" x="119" y="115" width="38" height="26" rx="4"/><text class="tok" x="138" y="132" text-anchor="middle">blue</text>
+    <rect class="cell" x="162" y="115" width="38" height="26" rx="4"/><text class="tok" x="181" y="132" text-anchor="middle">A:</text>
+    <rect class="slot" x="205" y="115" width="38" height="26" rx="4"/><use href="#noise" x="206" y="115"/>
+  </g>
+  <g class="m">
+    <text class="tok" x="36" y="185">yes</text>
+    <rect class="barbg" x="68" y="176" width="130" height="10" rx="3"/>
+    <rect class="bar" x="68" y="176" width="0" height="10" rx="3">
+      <animate attributeName="width" values="0;0;121;121;0" keyTimes="0;0.78;0.86;0.97;1" dur="6s" repeatCount="indefinite"/>
+    </rect>
+    <text class="tok" x="206" y="185" opacity="0">0.93<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.86;0.97;1" dur="6s" repeatCount="indefinite"/></text>
+    <text class="tok" x="36" y="207">no</text>
+    <rect class="barbg" x="68" y="198" width="130" height="10" rx="3"/>
+    <rect class="bar" x="68" y="198" width="0" height="10" rx="3">
+      <animate attributeName="width" values="0;0;9;9;0" keyTimes="0;0.78;0.86;0.97;1" dur="6s" repeatCount="indefinite"/>
+    </rect>
+    <text class="tok" x="206" y="207" opacity="0">0.07<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.86;0.97;1" dur="6s" repeatCount="indefinite"/></text>
+  </g>
+  <text class="s" x="140" y="236" text-anchor="middle">P(label token) per question</text>
+
+  <!-- vLLM -->
+  <rect class="box" x="380" y="50" width="240" height="200" rx="10"/>
+  <rect class="hl" x="380" y="50" width="240" height="200" rx="10" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;0;0;1;0;0" keyTimes="0;0.17;0.2;0.25;0.6;0.63;0.67;1" dur="6s" repeatCount="indefinite"/>
+  </rect>
+  <text class="t m" x="500" y="80" text-anchor="middle">vLLM :8000</text>
+  <text class="s" x="500" y="99" text-anchor="middle">DiffusionGemma 26B-A4B · NVFP4</text>
+  <g class="s m">
+    <text x="410" y="160">diffusion_seed_canvas</text>
+    <text x="410" y="178">diffusion_pinned</text>
+    <text x="410" y="196">diffusion_max_steps = 1</text>
+    <text x="410" y="214">diffusion_read_only</text>
+    <text x="410" y="232">logprob_token_ids</text>
+  </g>
+  <text class="s" x="500" y="130" text-anchor="middle">prefix cache · vllm_xargs:</text>
+
+  <!-- GPU -->
+  <rect class="box gpuline" x="740" y="50" width="200" height="200" rx="10"/>
+  <rect class="flash" x="740" y="50" width="200" height="200" rx="10" opacity="0" filter="url(#glow)">
+    <animate attributeName="opacity" values="0;0;.6;.15;.6;0;0" keyTimes="0;0.34;0.37;0.41;0.45;0.5;1" dur="6s" repeatCount="indefinite"/>
+  </rect>
+  <text class="t" x="840" y="80" text-anchor="middle">GB10 GPU</text>
+  <text class="s" x="840" y="99" text-anchor="middle">one denoise step</text>
+  <rect class="slot" x="800" y="130" width="80" height="40" rx="5"/>
+  <g opacity="1">
+    <use href="#noise" x="806" y="138"/><use href="#noise" x="836" y="138"/>
+    <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;0.43;0.44;0.97;1" dur="6s" repeatCount="indefinite"/>
+  </g>
+  <text class="yes m" x="840" y="155" text-anchor="middle" opacity="0">yes
+    <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.43;0.44;0.97;1" dur="6s" repeatCount="indefinite"/>
+  </text>
+  <text class="s" x="840" y="200" text-anchor="middle">argmax of answer slot</text>
+  <text class="s" x="840" y="218" text-anchor="middle">+ probs for label ids</text>
+
+  <!-- moving signals: request (blue) out, response (green) back -->
+  <g>
+    <circle class="preq" r="9" filter="url(#glow)"/><circle class="preq" r="5"/>
+    <animateMotion path="M262,150 H378" keyPoints="0;0;1;1" keyTimes="0;0.04;0.17;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.039;0.04;0.17;0.171;1" dur="6s" repeatCount="indefinite"/>
+  </g>
+  <g>
+    <circle class="preq" r="9" filter="url(#glow)"/><circle class="preq" r="5"/>
+    <animateMotion path="M622,150 H738" keyPoints="0;0;1;1" keyTimes="0;0.24;0.34;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.239;0.24;0.34;0.341;1" dur="6s" repeatCount="indefinite"/>
+  </g>
+  <g>
+    <circle class="pres" r="9" filter="url(#glow)"/><circle class="pres" r="5"/>
+    <animateMotion path="M738,205 H622" keyPoints="0;0;1;1" keyTimes="0;0.5;0.6;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.499;0.5;0.6;0.601;1" dur="6s" repeatCount="indefinite"/>
+  </g>
+  <g>
+    <circle class="pres" r="9" filter="url(#glow)"/><circle class="pres" r="5"/>
+    <animateMotion path="M378,205 H262" keyPoints="0;0;1;1" keyTimes="0;0.66;0.78;1" calcMode="linear" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.659;0.66;0.78;0.781;1" dur="6s" repeatCount="indefinite"/>
+  </g>
+
+  <text class="foot" x="480" y="280" text-anchor="middle">One noise draw shown. djev runs up to 4 per question ("samples": "auto") and averages the probabilities.</text>
+</svg>

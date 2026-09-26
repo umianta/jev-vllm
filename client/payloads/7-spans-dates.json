@@ -1,0 +1,2 @@
+{"model":"diffusiongemma","state":"Invoice #A-1042 issued 2024-02-01, total due $1,234.56 by 2024-03-15.",
+ "questions":{"dates":{"type":"spans","instructions":"date"}}}

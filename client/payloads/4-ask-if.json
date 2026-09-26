@@ -1,0 +1,4 @@
+{"model":"diffusiongemma","state":{"ticket":"Everything is down and we have a demo at noon."},
+ "questions":{
+  "urgent":{"type":"noul","instructions":"Does the customer need a reply within the hour?"},
+  "tone":{"type":"score","instructions":"How upset is the customer?","criteria":["calm","annoyed","furious"],"ask_if":{"urgent":["yes"]}}}}

@@ -1,0 +1,65 @@
+# djev (github.com/mmastrac/djev @ e5841cf) structured-decision server, in front of
+# the vLLM endpoint. Serves /v1/systemone and structured /v1/chat/completions on
+# :8011; everything else passes through to vLLM. CPU only: it reuses the vLLM
+# image (transformers + pybase64 already installed) and reads the tokenizer from
+# the cached model snapshot, so no HF access is needed at runtime.
+#
+# --canvas must equal canvas_length in 20-llmisvc-diffusiongemma.yaml.
+# --model is the vLLM served name, so /v1/models and router discovery line up.
+# The script is delivered by the djev-code ConfigMap (kustomization.yaml).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: djev
+  namespace: jev-vllm
+  labels:
+    app.kubernetes.io/part-of: jev-vllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: djev }
+  template:
+    metadata:
+      labels: { app: djev }
+    spec:
+      containers:
+        - name: djev
+          image: vllm/vllm-openai:nightly-7f1a5398e9610d96c473931a26c0e12bbe0d0423
+          command: ["python3", "/app/structured_server.py"]
+          args:
+            - --upstream=http://diffusiongemma-jev-kserve-workload-svc:8000
+            - --model=diffusiongemma
+            - --tokenizer=/hf-cache/hub/models--nvidia--diffusiongemma-26B-A4B-it-NVFP4/snapshots/ec4ff3df205028f4e81c954c2227f9312b3ec2ea
+            - --canvas=64
+            - --port=8011
+          env:
+            - { name: HF_HUB_OFFLINE, value: "1" }
+            - { name: TRANSFORMERS_OFFLINE, value: "1" }
+          ports:
+            - containerPort: 8011
+          resources:
+            requests: { cpu: 500m, memory: 1Gi }
+            limits: { memory: 4Gi }
+          readinessProbe:
+            httpGet: { path: /v1/models, port: 8011 }
+            periodSeconds: 10
+          volumeMounts:
+            - { name: code, mountPath: /app, readOnly: true }
+            - { name: hf-cache, mountPath: /hf-cache, readOnly: true }
+      volumes:
+        - name: code
+          configMap: { name: djev-code }
+        - name: hf-cache
+          persistentVolumeClaim: { claimName: hf-cache, readOnly: true }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: djev
+  namespace: jev-vllm
+  labels:
+    app.kubernetes.io/part-of: jev-vllm
+spec:
+  selector: { app: djev }
+  ports:
+    - { name: http, port: 8011, targetPort: 8011 }

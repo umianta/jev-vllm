@@ -1,0 +1,58 @@
+# One-shot download of nvidia/diffusiongemma-26B-A4B-it-NVFP4 (~19 GB, ungated)
+# into the node's HF cache, using huggingface_hub from the vLLM image.
+# Idempotent: snapshot_download skips files already present.
+#
+# The revision is pinned: 20-llmisvc-diffusiongemma.yaml and 30-djev.yaml load
+# snapshots/<REVISION>, so the cache must hold exactly that one.
+#
+# After the download it replaces the symlinks in the model's blobs/ with
+# hardlinks. This image's huggingface_hub keeps the real files in hub/blobs/,
+# outside the model directory the vLLM pod mounts, so the links would dangle.
+#
+# scripts/deploy.ts applies this with the cache path and uid/gid filled in.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-diffusiongemma
+  namespace: jev-vllm
+  labels:
+    app.kubernetes.io/part-of: jev-vllm
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: download
+          image: vllm/vllm-openai:nightly-7f1a5398e9610d96c473931a26c0e12bbe0d0423
+          securityContext:
+            runAsUser: 1000   # owner of the host cache directory
+            runAsGroup: 1000
+          command:
+            - python3
+            - -c
+            - |
+              import os
+              from huggingface_hub import snapshot_download
+              path = snapshot_download(
+                  "nvidia/diffusiongemma-26B-A4B-it-NVFP4",
+                  revision="ec4ff3df205028f4e81c954c2227f9312b3ec2ea",
+              )
+              print(path)
+              blobs = os.path.join(os.path.dirname(os.path.dirname(path)), "blobs")
+              for name in os.listdir(blobs):
+                  f = os.path.join(blobs, name)
+                  if os.path.islink(f):
+                      os.link(os.path.realpath(f), f + ".tmp")
+                      os.replace(f + ".tmp", f)
+                      print("hardlinked", name)
+          env:
+            - { name: HF_HOME, value: /hf-cache }
+          volumeMounts:
+            - { name: hf-cache, mountPath: /hf-cache }
+      volumes:
+        - name: hf-cache
+          hostPath:
+            path: /var/lib/jev-vllm/hf-cache   # set by scripts/deploy.ts --hf-cache
+            type: Directory

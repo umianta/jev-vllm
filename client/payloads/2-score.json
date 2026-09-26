@@ -1,0 +1,2 @@
+{"model":"diffusiongemma","state":{"ticket":"This is the THIRD time my order is late and nobody answers!!"},
+ "questions":{"tone":{"type":"score","instructions":"How upset is the customer?","criteria":["calm","annoyed","furious"]}}}

@@ -1,0 +1,35 @@
+# nvidia/diffusiongemma-26B-A4B-it-NVFP4 (~19 GB) is pulled once onto the node by
+# 05-download-job.yaml into a Hugging Face cache directory. Expose that directory
+# read-only so the pod never runs the KServe storage-initializer (its 1 GiB
+# container OOMs on big downloads; hf:// is avoided for that reason).
+#
+# node path:  set by scripts/deploy.ts --hf-cache (default ~/.cache/huggingface)
+# model URI:  pvc://hf-cache/hub/models--nvidia--diffusiongemma-26B-A4B-it-NVFP4
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jev-vllm-hf-cache
+  labels:
+    app.kubernetes.io/part-of: jev-vllm
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes: ["ReadOnlyMany"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /var/lib/jev-vllm/hf-cache   # set by scripts/deploy.ts --hf-cache
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hf-cache
+  namespace: jev-vllm
+spec:
+  accessModes: ["ReadOnlyMany"]
+  storageClassName: ""
+  volumeName: jev-vllm-hf-cache
+  resources:
+    requests:
+      storage: 200Gi

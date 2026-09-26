@@ -1,0 +1,83 @@
+# DiffusionGemma-26B-A4B (NVFP4) with Jev-style structured reads, on vLLM main,
+# served through KServe LLMInferenceService.
+#
+# Image: the Jev/structured-generation PR (vllm-project/vllm#57250) merged on
+# 2026-09-22, the same day v0.30.0 shipped, and v0.30.0 does NOT contain it. So
+# this pins a multi-arch nightly built from commit 7f1a539 (77 commits after the
+# merge). When a release after v0.30.0 ships, swap in that tag.
+#
+# Serve flags come from the PR description. NVFP4 needs a Blackwell GPU.
+# Written for a single-GPU unified-memory node (NVIDIA GB10 / DGX Spark on k3s):
+# runtimeClassName nvidia with no nvidia.com/gpu request, root user, explicit
+# command, gpu-memory-utilization 0.5. See "Adapting to other clusters" in the
+# README for discrete-GPU clusters. Single GPU: stop any other GPU pod first.
+apiVersion: serving.kserve.io/v1alpha2
+kind: LLMInferenceService
+metadata:
+  name: diffusiongemma-jev
+  namespace: jev-vllm
+  labels:
+    app.kubernetes.io/part-of: jev-vllm
+spec:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: /metrics
+  model:
+    uri: pvc://hf-cache/hub/models--nvidia--diffusiongemma-26B-A4B-it-NVFP4
+    name: diffusiongemma
+  replicas: 1
+  template:
+    runtimeClassName: nvidia
+    containers:
+      - name: main
+        image: vllm/vllm-openai:nightly-7f1a5398e9610d96c473931a26c0e12bbe0d0423
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
+        command:
+          - vllm
+          - serve
+          - /mnt/models/snapshots/ec4ff3df205028f4e81c954c2227f9312b3ec2ea
+        args:
+          - --served-model-name=diffusiongemma
+          - --port=8000
+          - '--diffusion-config={"canvas_length": 64}'
+          - --max-logprobs=32
+          - --enable-prefix-caching
+          - --async-scheduling
+          - --attention-backend=TRITON_ATTN
+          - --max-num-seqs=32
+          - --max-model-len=16384
+          - --gpu-memory-utilization=0.5
+          - --no-enable-log-requests
+        env:
+          - { name: NVIDIA_VISIBLE_DEVICES, value: "all" }
+          - { name: NVIDIA_DRIVER_CAPABILITIES, value: "compute,utility" }
+          - { name: VLLM_LOGGING_LEVEL, value: INFO }
+        ports:
+          - containerPort: 8000
+            protocol: TCP
+        resources:
+          limits:
+            memory: 100Gi
+          requests:
+            cpu: "4"
+            memory: 16Gi
+        volumeMounts:
+          - { name: dshm, mountPath: /dev/shm }
+        startupProbe:
+          httpGet: { path: /health, port: 8000 }
+          periodSeconds: 15
+          failureThreshold: 160
+        readinessProbe:
+          httpGet: { path: /health, port: 8000 }
+          periodSeconds: 10
+          failureThreshold: 6
+        livenessProbe:
+          httpGet: { path: /health, port: 8000 }
+          periodSeconds: 30
+          failureThreshold: 10
+    volumes:
+      - name: dshm
+        emptyDir: { medium: Memory, sizeLimit: 8Gi }

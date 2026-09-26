@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" width="960" height="240" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif">
+  <style>
+    :root { --bg:#ffffff; --box:#f6f8fa; --stroke:#d0d7de; --text:#1f2328; --muted:#59636e; --req:#0969da; --res:#1a7f37; --gpu:#8250df; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0d1117; --box:#161b22; --stroke:#30363d; --text:#e6edf3; --muted:#9198a1; --req:#4493f8; --res:#3fb950; --gpu:#ab7df8; }
+    }
+    .bg { fill: var(--bg); }
+    .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.5; }
+    .gpu { stroke: var(--gpu); }
+    .t { fill: var(--text); font-size: 17px; font-weight: 600; }
+    .s { fill: var(--muted); font-size: 12.5px; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .req { stroke: var(--req); stroke-width: 2; fill: none; }
+    .res { stroke: var(--res); stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+    .lreq { fill: var(--req); font-size: 11.5px; }
+    .lres { fill: var(--res); font-size: 11.5px; }
+    .hreq { fill: var(--req); }
+    .hres { fill: var(--res); }
+    .tag { fill: var(--gpu); font-size: 11px; font-weight: 600; letter-spacing: .08em; }
+  </style>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="hreq" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="hres" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <rect class="bg" width="960" height="240" rx="8"/>
+
+  <!-- boxes -->
+  <rect class="box" x="20" y="50" width="220" height="140" rx="10"/>
+  <text class="t" x="130" y="108" text-anchor="middle">Client</text>
+  <text class="s" x="130" y="130" text-anchor="middle">bun bench · curl · SDK</text>
+
+  <rect class="box" x="370" y="50" width="220" height="140" rx="10"/>
+  <text class="t m" x="480" y="100" text-anchor="middle">djev :8011</text>
+  <text class="s" x="480" y="122" text-anchor="middle">builds canvas</text>
+  <text class="s" x="480" y="140" text-anchor="middle">averages noise draws</text>
+  <text class="tag" x="480" y="176" text-anchor="middle">CPU</text>
+
+  <rect class="box gpu" x="720" y="50" width="220" height="140" rx="10"/>
+  <text class="t m" x="830" y="100" text-anchor="middle">vLLM :8000</text>
+  <text class="s" x="830" y="122" text-anchor="middle">DiffusionGemma 26B-A4B</text>
+  <text class="s" x="830" y="140" text-anchor="middle">NVFP4 · one denoise step</text>
+  <text class="tag" x="830" y="176" text-anchor="middle">GPU · GB10</text>
+
+  <!-- client -> djev -->
+  <path class="req" d="M240,92 H368" marker-end="url(#ar)"/>
+  <text class="lreq m" x="304" y="72" text-anchor="middle">/v1/systemone</text>
+  <text class="lreq m" x="304" y="86" text-anchor="middle">{state, questions}</text>
+  <path class="res" d="M370,150 H242" marker-end="url(#ag)"/>
+  <text class="lres" x="304" y="172" text-anchor="middle">answers +</text>
+  <text class="lres" x="304" y="186" text-anchor="middle">probabilities</text>
+
+  <!-- djev -> vLLM -->
+  <path class="req" d="M590,92 H718" marker-end="url(#ar)"/>
+  <text class="lreq m" x="654" y="72" text-anchor="middle">chat/completions</text>
+  <text class="lreq m" x="654" y="86" text-anchor="middle">+ vllm_xargs</text>
+  <path class="res" d="M720,150 H592" marker-end="url(#ag)"/>
+  <text class="lres" x="654" y="172" text-anchor="middle">logprobs for</text>
+  <text class="lres" x="654" y="186" text-anchor="middle">label tokens</text>
+</svg>

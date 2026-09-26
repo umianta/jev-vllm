@@ -1,0 +1,3 @@
+{"model":"diffusiongemma","state":{"ticket":"I was charged twice for my subscription this month."},
+ "questions":{"category":{"type":"choice","instructions":"What is this support ticket about?",
+   "criteria":{"billing":"payment, invoices, refunds","bug":"something is broken","sales":"pricing or buying"}}}}

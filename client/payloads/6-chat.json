@@ -1,0 +1,3 @@
+{"model":"diffusiongemma","messages":[
+ {"role":"system","content":"{\"questions\":[{\"id\":\"urgent\",\"type\":\"noul\",\"instructions\":\"Does the customer need a reply within the hour?\"},{\"id\":\"bucket\",\"type\":\"choice\",\"instructions\":\"Ticket topic?\",\"options\":[{\"name\":\"billing\",\"description\":\"payments\"},{\"name\":\"bug\",\"description\":\"broken\"}]}]}"},
+ {"role":"user","content":"{\"ticket\":\"Everything is down and we have a demo at noon.\"}"}]}

@@ -1,0 +1,6 @@
+{"model":"diffusiongemma","state":{"ticket":"Everything is down and we have a demo at noon. Please call me: 555-0100."},
+ "questions":{
+  "urgent":{"type":"noul","instructions":"Does the customer need a reply within the hour?"},
+  "category":{"type":"choice","instructions":"What is this ticket about?","criteria":{"billing":"payments","bug":"something broken","sales":"buying"}},
+  "escalate":{"type":"noul","instructions":"Should this be escalated to an on-call engineer?","depends_on":["urgent","category"]},
+  "phone":{"type":"span","instructions":"the phone number"}}}

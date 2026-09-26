@@ -1,0 +1,5 @@
+node_modules/
+docs/social/.frames-*/
+
+# local tooling output written to a literal "${HOME}" path; never publish
+**/${HOME}/
