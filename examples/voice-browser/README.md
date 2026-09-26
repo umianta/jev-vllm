@@ -9,11 +9,16 @@ by Moritz Kremb, which uses the hosted Jev API and Chrome's Web Speech API (audi
 goes to Google). This version adapts its question design and thresholds, and swaps
 both services for local ones.
 
+![The voice-control window next to a Google results page. Its log shows a real session: "Open YouTube", "Open Wikipedia", a YouTube search, "Open Google", "and type latest news in search" typing into Google's search box, and "Stop." ignored as no action, each decided in 128–217 ms.](docs/demo.png)
+
+*A real session in Chrome: every spoken command, what it did, and how long the
+decision took. The last one, "Stop.", was correctly ignored.*
+
 | | Measured on one NVIDIA GB10 |
 |---|---|
 | Speech-to-text (whisper.cpp `small.en`, CUDA) | 33–100 ms per partial transcript |
 | Decision (9–10 typed questions, one read) | ~130 ms p50, ~140 ms p95 |
-| Spoken-command eval | 37 / 38 |
+| Spoken-command eval | 37 / 38 (a borderline case occasionally flips to 36) |
 | Cost per decision | none beyond your GPU |
 
 ## How it works
@@ -99,6 +104,11 @@ bun run server
    `extension/` over if you built it remotely.
 3. In Chrome or Edge, open `chrome://extensions`, turn on **Developer mode**, click
    **Load unpacked** and pick the `extension/` folder.
+   It then appears under the toolbar's Extensions menu with access to the sites
+   you visit, which it needs to read and click the page:
+
+   ![Chrome's Extensions menu listing "jev voice browser (local)" under Full access](docs/extension-access.png)
+
 4. Click the extension's toolbar button. In the control window, press **Start
    listening** and allow the microphone.
 5. Switch to a normal tab and talk: "open wikipedia", "search for the enigma
@@ -122,7 +132,8 @@ bun run typecheck
 
 The eval ([`eval/cases.ts`](eval/cases.ts)) covers open, search, click by
 description, type, scroll, navigation, tabs, confirmation of destructive actions,
-non-commands and mid-sentence behaviour. Current result: **37/38**.
+non-commands and mid-sentence behaviour. Current result: **37/38**; the decision
+uses one noise draw, so a borderline case occasionally flips and a run scores 36/38.
 
 ## Known limitations
 
@@ -141,8 +152,12 @@ non-commands and mid-sentence behaviour. Current result: **37/38**.
   `src/policy.ts` were set on this eval, not on real usage.
 - **Chrome and Edge only**, and not on `chrome://` pages or the Web Store, where
   extensions can't run scripts (navigation still works there).
-- The extension's page scripts are tested in happy-dom, not yet in a real browser
-  across many sites.
+- **Misheard words.** whisper sometimes mishears the command verb ("such for love
+  in magic"). The intent still comes out right, and search extraction drops a
+  misheard verb before "for", but other mishearings end up in the search text.
+- **Real-browser coverage is small.** The page scripts are unit-tested in happy-dom
+  and have been used in Chrome on YouTube, Wikipedia and Google (open, search, and
+  typing into Google's search box), not yet across many sites.
 
 ## Layout
 

@@ -167,6 +167,8 @@ audio or data leaves your hardware.**
 the hosted Jev API and Chrome's cloud speech recognition. Here, speech-to-text runs
 on your GPU with whisper.cpp and every decision is a call to this deployment.
 
+![The voice-control window next to Google results, logging a real session: open YouTube, open Wikipedia, search YouTube, open Google, type "latest news" into Google's search box, and "Stop." ignored, each decided in 128–217 ms](examples/voice-browser/docs/demo.png)
+
 - **Say it naturally:** "open wikipedia", "search for lofi music on youtube",
   "play the one about transformers", "type octocat in the username field",
   "scroll to the bottom", "next tab".

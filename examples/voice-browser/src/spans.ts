@@ -37,7 +37,9 @@ export function searchSpan(transcript: string): { text: string; site: string | n
     site = on[1].toLowerCase();
     t = t.slice(0, on.index).trim();
   }
-  const text = unquote(t.replace(SEARCH, ""));
+  // Only called once the model has decided this is a search, so a misheard verb
+  // ("such for", "surge for") before "for" is dropped too.
+  const text = unquote(SEARCH.test(t) ? t.replace(SEARCH, "") : t.replace(/^\w+ for\s+/i, ""));
   // Question forms ("what is X", "who was X") keep their question words for the search.
   const q = t.match(/^(what(?:'s| is| are)|who(?:'s| is| was)|how (?:do|to|does|did))\s+/i);
   const out = q ? unquote(t) : text;

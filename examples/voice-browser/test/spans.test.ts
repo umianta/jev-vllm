@@ -23,6 +23,7 @@ describe("searchSpan", () => {
     ["find me cheap flights to Lisbon", "cheap flights to Lisbon", null],
     ["what is a transformer model", "what is a transformer model", null],
     ["google how to boil an egg", "how to boil an egg", null],
+    ["such for love in magic on YouTube", "love in magic", "youtube"], // "search" misheard, seen in a real session
   ])("%p → %p on %p", (said, text, site) => expect(searchSpan(said)).toEqual({ text, site }));
 
   test("nothing to search", () => expect(searchSpan("search for")).toBeNull());
