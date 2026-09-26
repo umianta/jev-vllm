@@ -2,8 +2,8 @@
 // snapshot of the active tab, and carries out the actions it sends back.
 import type { Action, ClientMessage, PageState, ServerMessage, Verdict } from "../../src/types";
 import { runPageAction, snapshotPage } from "./page";
+import { DEFAULT_SERVER, normalizeServer } from "./url";
 
-const DEFAULT_SERVER = "ws://localhost:8790/ws";
 const SNAPSHOT_EVERY_MS = 1500;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -31,7 +31,9 @@ function send(m: ClientMessage) {
 
 function connect() {
   ws?.close();
-  const url = ui.server.value.trim() || DEFAULT_SERVER;
+  const { url, warning } = normalizeServer(ui.server.value);
+  ui.server.value = url;
+  if (warning) showVerdict("error", warning);
   ws = new WebSocket(url);
   ws.binaryType = "arraybuffer";
   ws.onopen = () => {
@@ -219,7 +221,7 @@ async function onServer(m: ServerMessage) {
 const stored = await chrome.storage.local.get("server");
 ui.server.value = (stored.server as string) ?? DEFAULT_SERVER;
 ui.server.onchange = () => {
-  void chrome.storage.local.set({ server: ui.server.value.trim() });
-  connect();
+  connect(); // normalizes the field first
+  void chrome.storage.local.set({ server: ui.server.value });
 };
 connect();
