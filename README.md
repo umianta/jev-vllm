@@ -4,10 +4,11 @@
 probabilities back, not paragraphs.** Runs on your own GPU with open weights and
 speaks the same `/v1/systemone` API as TypeSafe AI's Jev.
 
-[![Explainer video: architecture, live /v1/systemone requests, performance and the voice browser (1:54)](docs/social/jev-vllm-explainer-thumbnail.png)](docs/social/jev-vllm-explainer.mp4)
+[![Preview: a live POST /v1/systemone request typed into an API client, sent, and answered with 200 OK in 76 ms with "noul": 0.9715](docs/social/jev-vllm-explainer-preview.gif)](docs/social/jev-vllm-explainer.mp4)
 
-*Two-minute explainer: architecture, live requests and responses, performance, and
-the voice browser. Every payload and number in it was captured from a live deployment.*
+**[▶ Watch the full 2-minute explainer](docs/social/jev-vllm-explainer.mp4)**: architecture,
+live requests and responses, performance, and the voice browser. Every payload and
+number in it was captured from a live deployment.
 
 ## Why
 
