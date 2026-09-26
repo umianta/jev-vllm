@@ -104,14 +104,6 @@ flowchart LR
 
 </details>
 
-## Example: voice browser
-
-[`examples/voice-browser`](examples/voice-browser) lets you talk to your browser:
-it clicks, types, scrolls and navigates, often before you finish the sentence. It
-uses local whisper.cpp for speech-to-text, and one `/v1/systemone` read of 9–10
-typed questions per partial transcript (~130 ms on a GB10). It scores 37/38 on its
-spoken-command eval, and no audio or data leaves your hardware.
-
 ## Quick start
 
 ### Requirements
@@ -165,6 +157,49 @@ curl -s localhost:8011/v1/systemone -H 'content-type: application/json' \
 djev has no authentication unless `API_KEY` is set in its environment (it then
 requires `Authorization: Bearer <key>`). Keep the port-forward on localhost, or add
 `--address 0.0.0.0` to expose it on your LAN.
+
+## Example: voice browser
+
+**Talk to your browser. It acts, often before you finish the sentence, and no
+audio or data leaves your hardware.**
+[`examples/voice-browser`](examples/voice-browser) is a self-hosted take on
+[jev-voice-browser](https://github.com/moritzkremb/jev-voice-browser), which uses
+the hosted Jev API and Chrome's cloud speech recognition. Here, speech-to-text runs
+on your GPU with whisper.cpp and every decision is a call to this deployment.
+
+- **Say it naturally:** "open wikipedia", "search for lofi music on youtube",
+  "play the one about transformers", "type octocat in the username field",
+  "scroll to the bottom", "next tab".
+- **It acts mid-sentence** when a command is confident and complete, and waits for
+  a pause when it's still ambiguous or the text is still arriving.
+- **Safety gates:** speech not meant for the browser is ignored, actions that would
+  buy, delete or submit need a spoken "confirm", and unclear targets are
+  highlighted so you can pick by letter.
+
+How it works: a Chrome extension streams your microphone and a snapshot of the
+active tab (up to 26 labelled links, buttons and fields) to a small bun server on
+the GPU box. The server re-transcribes the growing utterance every 300 ms and sends
+each partial transcript to `/v1/systemone` as **one request with 9–10 typed
+questions** (intent, target element, is it a command, is it finished, is it
+destructive, scroll direction...). A threshold policy turns the probabilities
+into act, wait, confirm, disambiguate or ignore, and the extension clicks, types or
+navigates in your real browser.
+
+| Measured on one GB10 | |
+|---|---|
+| Speech-to-text (whisper.cpp `small.en`, CUDA) | 33–100 ms per partial transcript |
+| Decision (9–10 questions, one read) | ~130 ms p50 |
+| Spoken-command eval | 37/38 |
+
+```bash
+cd examples/voice-browser && bun install
+bun run setup:whisper                  # builds whisper.cpp, downloads small.en
+bun run server                         # needs djev (DJEV_URL) and whisper-server running
+bun run build                          # then load extension/ unpacked in Chrome
+```
+
+Full setup, the question set, known limitations and the eval are in the
+[example's README](examples/voice-browser/README.md).
 
 ## API
 
