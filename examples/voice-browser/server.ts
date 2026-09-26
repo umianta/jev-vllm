@@ -61,3 +61,22 @@ const server = Bun.serve<{ session: Session }>({
 console.log(`voice-browser server on ws://${server.hostname}:${server.port}/ws
   djev:    ${DJEV_URL}
   whisper: ${WHISPER_URL}`);
+
+// Fail loudly at startup rather than on the first spoken command.
+async function reachable(url: string) {
+  try {
+    await fetch(url, { signal: AbortSignal.timeout(3000), headers: { connection: "close" } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+if (!(await reachable(`${DJEV_URL}/v1/models`))) {
+  console.warn(`\n! djev is not reachable at ${DJEV_URL}. Start a port-forward:
+    kubectl -n jev-vllm port-forward svc/djev 8011:8011
+  or point at the service directly (works on the k3s node):
+    DJEV_URL=http://$(kubectl -n jev-vllm get svc djev -o jsonpath='{.spec.clusterIP}'):8011 bun server.ts`);
+}
+if (!(await reachable(WHISPER_URL))) {
+  console.warn(`\n! whisper.cpp is not reachable at ${WHISPER_URL}. See "Setup" in README.md.`);
+}

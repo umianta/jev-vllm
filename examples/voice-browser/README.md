@@ -82,8 +82,10 @@ bun run setup:whisper
 ~/.cache/jev-voice/whisper.cpp/build/bin/whisper-server \
   -m ~/.cache/jev-voice/whisper.cpp/models/ggml-small.en.bin --host 127.0.0.1 --port 8178 -nt &
 
-# 2. djev reachable on localhost:8011
+# 2. djev reachable on localhost:8011 ...
 kubectl -n jev-vllm port-forward svc/djev 8011:8011 &
+#    ... or skip the port-forward on the k3s node and use the service address:
+#    export DJEV_URL=http://$(kubectl -n jev-vllm get svc djev -o jsonpath='{.spec.clusterIP}'):8011
 
 # 3. The voice-browser server (127.0.0.1:8790)
 bun run server
